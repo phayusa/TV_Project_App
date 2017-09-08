@@ -27,7 +27,6 @@ import java.util.List;
 public class StreamFactory extends AsyncTask<String, Void, Void> {
     public HashMap<Type, HashMap<Tag, HashMap<Category, List<Stream>>>> map_categ_channel;
     private DataLoadingInterface data_loader;
-    private SpinnerFragment spinnerFragment;
 
     public StreamFactory(DataLoadingInterface data_loader) {
         this.data_loader = data_loader;
@@ -58,7 +57,7 @@ public class StreamFactory extends AsyncTask<String, Void, Void> {
     @Override
     protected Void doInBackground(String... params) {
         try {
-            JSONArray type = requestData(params[2]);
+            /*JSONArray type = requestData(params[2]);
             int nb_type = type.length();
             for (int type_id = 0; type_id < nb_type; type_id++) {
                 map_categ_channel.put(new Type(type.getJSONObject(type_id)), new HashMap<Tag, HashMap<Category, List<Stream>>>());
@@ -104,21 +103,21 @@ public class StreamFactory extends AsyncTask<String, Void, Void> {
                         }
                     }
                 }
-            }
+            }*/
 
 
         } catch (NullPointerException e) {
             e.printStackTrace();
-        } catch (JSONException e) {
+        } /*catch (JSONException e) {
             e.printStackTrace();
-        }
+        }*/
         return null;
     }
 
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        data_loader.received_datas(map_categ_channel);
+        //data_loader.received_datas(map_categ_channel);
     }
 
 }

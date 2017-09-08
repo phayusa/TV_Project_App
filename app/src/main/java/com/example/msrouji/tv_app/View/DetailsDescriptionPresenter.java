@@ -26,9 +26,8 @@ public class DetailsDescriptionPresenter extends AbstractDetailsDescriptionPrese
 
         if (movie != null) {
             viewHolder.getTitle().setText(movie.getName());
-            // TODO : ADD with the add of API
             //viewHolder.getSubtitle().setText(movie.getStudio());
-            //viewHolder.getBody().setText(movie.getDescription());
+            viewHolder.getBody().setText(movie.getSummary());
         }
     }
 }

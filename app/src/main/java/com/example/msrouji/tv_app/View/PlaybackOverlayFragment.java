@@ -51,14 +51,12 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
-import com.example.msrouji.tv_app.Controller.StreamFactory;
 import com.example.msrouji.tv_app.Model.Stream;
 import com.example.msrouji.tv_app.R;
+import com.example.msrouji.tv_app.View.presenter.CardPresenter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
 /*
  * Class for video playback with media control
@@ -105,7 +103,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
         // TODO CHECK MODIF
         mItems = new ArrayList<Stream>();
         mSelectedMovie = (Stream) getActivity()
-                .getIntent().getSerializableExtra(DetailsActivity.MOVIE);
+                .getIntent().getSerializableExtra(DetailsActivity.STREAM);
 
         //Collection<List<Stream>> streams = StreamFactory.map_categ_channel.values();
         mCurrentItem = 0;

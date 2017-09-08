@@ -24,10 +24,7 @@ import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.ClassPresenterSelector;
 import android.support.v17.leanback.widget.DetailsOverviewRow;
 import android.support.v17.leanback.widget.DetailsOverviewRowPresenter;
-import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ImageCardView;
-import android.support.v17.leanback.widget.ListRow;
-import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.OnActionClickedListener;
 import android.support.v17.leanback.widget.OnItemViewClickedListener;
 import android.support.v17.leanback.widget.Presenter;
@@ -42,20 +39,16 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.example.msrouji.tv_app.Controller.DataLoadingInterface;
+import com.example.msrouji.tv_app.Controller.GridFactory;
+import com.example.msrouji.tv_app.Model.HeaderInfo;
 import com.example.msrouji.tv_app.Model.Stream;
-import com.example.msrouji.tv_app.Movie;
-import com.example.msrouji.tv_app.MovieList;
 import com.example.msrouji.tv_app.R;
 import com.example.msrouji.tv_app.Utils;
-import com.example.msrouji.tv_app.View.CardPresenter;
-import com.example.msrouji.tv_app.View.DetailsActivity;
-import com.example.msrouji.tv_app.View.DetailsDescriptionPresenter;
-import com.example.msrouji.tv_app.View.MainActivity;
-import com.example.msrouji.tv_app.View.PlaybackOverlayActivity;
+import com.example.msrouji.tv_app.View.presenter.GridItemPresenter;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
 
 /*
  * LeanbackDetailsFragment extends DetailsFragment, a Wrapper fragment for leanback details screens.
@@ -69,7 +62,7 @@ public class VideoDetailsFragment extends DetailsFragment {
     private static final int ACTION_BUY = 3;
 
     private static final int DETAIL_THUMB_WIDTH = 274;
-    private static final int DETAIL_THUMB_HEIGHT = 274;
+    private static final int DETAIL_THUMB_HEIGHT = 400;
 
     private static final int NUM_COLS = 10;
 
@@ -84,17 +77,19 @@ public class VideoDetailsFragment extends DetailsFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate DetailsFragment");
+        //Log.d(TAG, "onCreate DetailsFragment");
         super.onCreate(savedInstanceState);
 
         prepareBackgroundManager();
 
         mSelectedStream = (Stream) getActivity().getIntent()
-                .getSerializableExtra(DetailsActivity.MOVIE);
+                .getSerializableExtra(DetailsActivity.STREAM);
         if (mSelectedStream != null) {
+            new GridFactory(new DataListener(), new GridItemPresenter(400,400)).execute("http://10.53.8.144:8000/TV/"+ ((DetailsActivity) getActivity()).getUrl_data());
+
             setupAdapter();
-            setupDetailsOverviewRow();
             setupDetailsOverviewRowPresenter();
+
             // TODO : change to call API
             //setupMovieListRow();
             //setupMovieListRowPresenter();
@@ -140,16 +135,17 @@ public class VideoDetailsFragment extends DetailsFragment {
     }
 
     private void setupDetailsOverviewRow() {
-        Log.d(TAG, "doInBackground: " + mSelectedStream.toString());
+        //Log.d(TAG, "doInBackground: " + mSelectedStream.toString());
         final DetailsOverviewRow row = new DetailsOverviewRow(mSelectedStream);
         row.setImageDrawable(getResources().getDrawable(R.drawable.default_background));
+
+
         int width = Utils.convertDpToPixel(getActivity()
                 .getApplicationContext(), DETAIL_THUMB_WIDTH);
         int height = Utils.convertDpToPixel(getActivity()
                 .getApplicationContext(), DETAIL_THUMB_HEIGHT);
-        /*Glide.with(getActivity())
-                .load(mSelectedStream.getCardImageUrl())
-                .load(mSelectedStream.getCardImageUrl())
+        Glide.with(getActivity())
+                .load(mSelectedStream.getImage_url())
                 .centerCrop()
                 .error(R.drawable.default_background)
                 .into(new SimpleTarget<GlideDrawable>(width, height) {
@@ -161,17 +157,15 @@ public class VideoDetailsFragment extends DetailsFragment {
                         row.setImageDrawable(resource);
                         mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size());
                     }
-                });*/
+                });
 
         row.addAction(new Action(ACTION_WATCH_TRAILER, getResources().getString(
                 R.string.Start), getResources().getString(R.string.watch_trailer_2)));
-        //row.addAction(new Action(ACTION_RENT, getResources().getString(R.string.rent_1),
-        //        getResources().getString(R.string.rent_2)));
-        //row.addAction(new Action(ACTION_BUY, getResources().getString(R.string.buy_1),
-        //        getResources().getString(R.string.buy_2)));
 
         mAdapter.add(row);
+        //mAdapter.add(data_received);
     }
+
 
     private void setupDetailsOverviewRowPresenter() {
         // Set detail background and style.
@@ -184,46 +178,29 @@ public class VideoDetailsFragment extends DetailsFragment {
         detailsPresenter.setSharedElementEnterTransition(getActivity(),
                 DetailsActivity.SHARED_ELEMENT_NAME);
 
-        detailsPresenter.setOnActionClickedListener(new OnActionClickedListener() {
+        /*detailsPresenter.setOnActionClickedListener(new OnActionClickedListener() {
             @Override
             public void onActionClicked(Action action) {
                 if (action.getId() == ACTION_WATCH_TRAILER) {
                     Intent intent = new Intent(getActivity(), PlaybackOverlayActivity.class);
-                    intent.putExtra(DetailsActivity.MOVIE, (Serializable) mSelectedStream);
+                    intent.putExtra(DetailsActivity.STREAM, (Serializable) mSelectedStream);
                     startActivity(intent);
                 } else {
                     Toast.makeText(getActivity(), action.toString(), Toast.LENGTH_SHORT).show();
                 }
             }
-        });
+        });*/
         mPresenterSelector.addClassPresenter(DetailsOverviewRow.class, detailsPresenter);
     }
 
-    private void setupMovieListRow() {
-        String subcategories[] = {getString(R.string.related_movies)};
-        List<Movie> list = MovieList.list;
-
-        Collections.shuffle(list);
-        ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new CardPresenter());
-        for (int j = 0; j < NUM_COLS; j++) {
-            listRowAdapter.add(list.get(j % 5));
-        }
-
-        HeaderItem header = new HeaderItem(0, subcategories[0]);
-        mAdapter.add(new ListRow(header, listRowAdapter));
-    }
-
-    private void setupMovieListRowPresenter() {
-        mPresenterSelector.addClassPresenter(ListRow.class, new ListRowPresenter());
-    }
 
     private final class ItemViewClickedListener implements OnItemViewClickedListener {
         @Override
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
                                   RowPresenter.ViewHolder rowViewHolder, Row row) {
 
-            if (item instanceof Movie) {
-                Movie movie = (Movie) item;
+            if (item instanceof Stream) {
+                Stream movie = (Stream) item;
                 Log.d(TAG, "Item: " + item.toString());
                 Intent intent = new Intent(getActivity(), DetailsActivity.class);
                 intent.putExtra(getResources().getString(R.string.movie), (Serializable) mSelectedStream);
@@ -237,6 +214,27 @@ public class VideoDetailsFragment extends DetailsFragment {
                         DetailsActivity.SHARED_ELEMENT_NAME).toBundle();
                 getActivity().startActivity(intent, bundle);
             }
+        }
+    }
+
+    private final class DataListener implements DataLoadingInterface{
+        @Override
+        public void received_datas(HashMap<HeaderInfo, ArrayObjectAdapter> data) {
+
+            //setAdapter(data.get(null));
+            setupDetailsOverviewRow();
+
+            System.err.println(((HeaderInfo) ((ArrayObjectAdapter) data.get(null)).get(0)).getName());
+        }
+
+        @Override
+        public void request_data() {
+
+        }
+
+        @Override
+        public void on_error() {
+
         }
     }
 }

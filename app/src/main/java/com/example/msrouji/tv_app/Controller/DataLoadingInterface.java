@@ -1,6 +1,9 @@
 package com.example.msrouji.tv_app.Controller;
 
+import android.support.v17.leanback.widget.ArrayObjectAdapter;
+
 import com.example.msrouji.tv_app.Model.Category;
+import com.example.msrouji.tv_app.Model.HeaderInfo;
 import com.example.msrouji.tv_app.Model.Stream;
 import com.example.msrouji.tv_app.Model.Tag;
 import com.example.msrouji.tv_app.Model.Type;
@@ -14,6 +17,7 @@ import java.util.List;
  */
 
 public interface DataLoadingInterface {
-    public void received_datas(HashMap<Type, HashMap<Tag, HashMap<Category, List<Stream>>>> data);
-    public void request_data();
+    void received_datas(HashMap<HeaderInfo, ArrayObjectAdapter>  data);
+    void request_data();
+    void on_error();
 }

@@ -9,7 +9,7 @@ import java.io.Serializable;
  * Created by msrouji on 01/09/2017.
  */
 
-public class Category implements Serializable{
+public class Category implements Serializable, NameInfo {
     static final long serialVersionUID = 727566134075960653L;
 
     private long id;
@@ -37,11 +37,22 @@ public class Category implements Serializable{
         return id;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
     public long getTag() {
         return tag;
+    }
+
+    public void buildFromJson(JSONObject object) {
+        try {
+            id = object.getLong("id");
+            name = object.getString("name");
+            tag = object.getLong("tag");
+        }catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

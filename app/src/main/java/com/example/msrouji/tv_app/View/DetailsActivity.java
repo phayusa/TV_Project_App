@@ -24,7 +24,11 @@ import com.example.msrouji.tv_app.R;
  */
 public class DetailsActivity extends Activity {
     public static final String SHARED_ELEMENT_NAME = "hero";
-    public static final String MOVIE = "Stream";
+    public static final String STREAM = "Stream";
+
+    public static final String key_url = "kbsndsiudus";
+
+    private String url_data;
 
     /**
      * Called when the activity is first created.
@@ -32,7 +36,13 @@ public class DetailsActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        url_data = getIntent().getStringExtra(key_url);
+
         setContentView(R.layout.activity_details);
     }
 
+    public String getUrl_data() {
+        return url_data;
+    }
 }

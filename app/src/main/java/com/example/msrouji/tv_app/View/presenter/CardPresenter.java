@@ -12,8 +12,10 @@
  * the License.
  */
 
-package com.example.msrouji.tv_app.View;
+package com.example.msrouji.tv_app.View.presenter;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v17.leanback.widget.BaseCardView;
 import android.support.v17.leanback.widget.ImageCardView;
@@ -22,8 +24,15 @@ import android.util.Log;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
 import com.example.msrouji.tv_app.Model.Stream;
 import com.example.msrouji.tv_app.R;
+import com.example.msrouji.tv_app.Utils;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+
+import java.net.URI;
 
 /*
  * A CardPresenter is used to generate Views and bind Objects to them on demand.
@@ -34,7 +43,7 @@ public class CardPresenter extends Presenter {
 
     private static final int CARD_WIDTH = 313;
     private static final int CARD_WIDTH_NO_IMG = 150;
-    private static final int CARD_HEIGHT = 176;
+    private static final int CARD_HEIGHT = 400;
     private static int sSelectedBackgroundColor;
     private static int sDefaultBackgroundColor;
     private Drawable mDefaultCardImage;
@@ -53,7 +62,7 @@ public class CardPresenter extends Presenter {
 
         sDefaultBackgroundColor = parent.getResources().getColor(R.color.default_background);
         sSelectedBackgroundColor = parent.getResources().getColor(R.color.selected_background);
-        mDefaultCardImage = parent.getResources().getDrawable(R.drawable.movie);
+        //mDefaultCardImage = parent.getResources().getDrawable(R.drawable.movie);
 
         ImageCardView cardView = new ImageCardView(parent.getContext()) {
             @Override
@@ -73,40 +82,87 @@ public class CardPresenter extends Presenter {
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
         ImageCardView cardView = (ImageCardView) viewHolder.view;
 
-        if (item instanceof String){
+        if (item instanceof String) {
             Log.d(TAG, "onBindViewHolder String");
             cardView.setTitleText(((String) item));
             cardView.setContentText("");
             cardView.setMainImageDimensions(CARD_WIDTH_NO_IMG, CARD_HEIGHT);
             cardView.setCardType(BaseCardView.CARD_TYPE_INFO_OVER);
             cardView.setTextAlignment(BaseCardView.TEXT_ALIGNMENT_CENTER);
-        }else {
+        } else {
+            Stream stream = ((Stream) item);
+
             Log.d(TAG, "onBindViewHolder Stream");
-            cardView.setTitleText(((Stream) item).getName());
-            cardView.setContentText(((Stream) item).getUrl());
+            cardView.setTitleText(stream.getName());
+            //cardView.setContentText(stream.getSummary());
             cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
             cardView.setCardType(BaseCardView.CARD_TYPE_INFO_UNDER_WITH_EXTRA);
+
+
+            if (stream.getImage_url() != null) {
+                cardView.setTitleText(stream.getName());
+                cardView.setContentText(stream.getSummary());
+                cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
+
+                Glide.with(viewHolder.view.getContext())
+                        .load(stream.getImage_url())
+                        .centerCrop()
+                        .listener(new RequestListener<String, GlideDrawable>() {
+
+                            @Override
+                            public boolean onException(Exception e, String model, com.bumptech.glide.request.target.Target<GlideDrawable> target, boolean isFirstResource) {
+                                Log.e("IMAGE_EXCEPTION", "Exception " + e.toString());
+                                e.printStackTrace();
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(GlideDrawable resource, String model, com.bumptech.glide.request.target.Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                Log.e("IMAGE","Sometimes the image is not loaded and this text is not displayed");
+                                return false;
+                            }
+
+                        })
+                        .error(mDefaultCardImage)
+                        .dontAnimate()
+                        .into(cardView.getMainImageView());
+            }
+
         }
 
 
-        /*if (movie.getCardImageUrl() != null) {
-            cardView.setTitleText(movie.getTitle());
-            cardView.setContentText(movie.getStudio());
-            cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
-            Glide.with(viewHolder.view.getContext())
-                    .load(movie.getCardImageUrl())
-                    .centerCrop()
-                    .error(mDefaultCardImage)
-                    .into(cardView.getMainImageView());
-        }*/
     }
 
     @Override
     public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {
         Log.d(TAG, "onUnbindViewHolder");
-        ImageCardView cardView = (ImageCardView) viewHolder.view;
+        //ImageCardView cardView = (ImageCardView) viewHolder.view;
         // Remove references to images so that the garbage collector can free up memory
-        cardView.setBadgeImage(null);
-        cardView.setMainImage(null);
+        //cardView.setBadgeImage(null);
+        //cardView.setMainImage(null);
     }
+
+    /*public static class PicassoImageCardViewTarget implements Target {
+        private ImageCardView mImageCardView;
+
+        public PicassoImageCardViewTarget(ImageCardView imageCardView) {
+            mImageCardView = imageCardView;
+        }
+
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom loadedFrom) {
+            Drawable bitmapDrawable = new BitmapDrawable(mContext.getResources(), bitmap);
+            mImageCardView.setMainImage(bitmapDrawable);
+        }
+
+        @Override
+        public void onBitmapFailed(Drawable drawable) {
+            mImageCardView.setMainImage(drawable);
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable drawable) {
+            // Do nothing, default_background manager has its own transitions
+        }
+    }*/
 }

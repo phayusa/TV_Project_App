@@ -63,7 +63,8 @@ public class BrowseErrorActivity extends Activity {
                 getFragmentManager().beginTransaction().remove(mSpinnerFragment).commit();
                 mErrorFragment.setErrorContent();
             }
-        }, TIMER_DELAY);
+        }, 0);
+
     }
 
     static public class SpinnerFragment extends Fragment {

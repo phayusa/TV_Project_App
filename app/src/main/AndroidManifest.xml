@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.msrouji.tv_app">
-
+®
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="Manifest.permission.WRITE_EXTERNAL_STORAGE" />
@@ -35,7 +35,7 @@
         <activity android:name=".View.DetailsActivity" />
         <activity android:name=".View.PlaybackOverlayActivity" />
         <activity android:name=".View.BrowseErrorActivity" />
-        <activity android:name=".CategoryActivity"></activity>
+        <activity android:name=".View.GridActivity"></activity>
     </application>
 
 </manifest>

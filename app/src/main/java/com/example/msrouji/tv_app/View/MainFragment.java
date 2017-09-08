@@ -16,12 +16,10 @@ package com.example.msrouji.tv_app.View;
 
 import java.net.URI;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,32 +38,29 @@ import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
-import com.example.msrouji.tv_app.CategoryActivity;
-import com.example.msrouji.tv_app.Controller.StreamFactory;
+import com.example.msrouji.tv_app.Controller.MainFactory;
 import com.example.msrouji.tv_app.Controller.DataLoadingInterface;
-import com.example.msrouji.tv_app.Model.Category;
+import com.example.msrouji.tv_app.Model.HeaderInfo;
 import com.example.msrouji.tv_app.Model.Stream;
 import com.example.msrouji.tv_app.Model.Tag;
 import com.example.msrouji.tv_app.Model.Type;
-import com.example.msrouji.tv_app.Movie;
 import com.example.msrouji.tv_app.R;
+import com.example.msrouji.tv_app.View.presenter.CardPresenter;
+import com.example.msrouji.tv_app.View.presenter.GridItemPresenter;
 
-public class MainFragment extends BrowseFragment implements DataLoadingInterface {
+public class MainFragment extends BrowseFragment {
     private static final String TAG = "MainFragment";
 
-    private static final int BACKGROUND_UPDATE_DELAY = 300;
-    private static final int GRID_ITEM_WIDTH = 200;
-    private static final int GRID_ITEM_HEIGHT = 200;
+    private static final int BACKGROUND_UPDATE_DELAY = 0;
+    private static final int GRID_ITEM_WIDTH = 500;
+    private static final int GRID_ITEM_HEIGHT = 500;
     private static final int NUM_COLS = 15;
 
     private final Handler mHandler = new Handler();
@@ -77,8 +72,9 @@ public class MainFragment extends BrowseFragment implements DataLoadingInterface
     private BackgroundManager mBackgroundManager;
     private SpinnerFragment spinnerFragment;
 
+    private boolean error_occured;
+
     // Data getting by the request
-    private HashMap<Type, HashMap<Tag, HashMap<Category, List<Stream>>>> loaded_data;
     private Type last_type_choosed;
     private Tag last_tag_choosed;
 
@@ -91,8 +87,24 @@ public class MainFragment extends BrowseFragment implements DataLoadingInterface
 
         setupUIElements();
 
-        String ip = "10.53.8.178:8000";
-        new StreamFactory(this).execute("http://" + ip + "/TV/channels/", "http://" + ip + "/TV/categories/", "http://" + ip + "/TV/types/", "http://" + ip + "/TV/tags/");
+        if (getActivity().getClass().getSimpleName().equals("MainActivity")) {
+            MainActivity activity = ((MainActivity) getActivity());
+            if (activity.getHeader_url() == null)
+                loadDefaultRows();
+            else {
+                setTitle(activity.getTitle_view());
+                if (activity.getTitle_view().equals("Series"))
+                    new MainFactory(new Data_receiver(), new CardPresenter(), activity.getNb_columns())
+                            .execute("http://10.53.8.144:8000/", activity.getHeader_url(), activity.getData_url());
+                else
+                    new MainFactory(new Data_receiver(), new GridItemPresenter(300, 300), activity.getNb_columns())
+                            .execute("http://10.53.8.144:8000/", activity.getHeader_url(), activity.getData_url());
+            }
+        }
+
+
+        //String ip = "10.53.8.149:8000";
+        //new StreamFactory(this).execute("http://" + ip + "/TV/channels/", "http://" + ip + "/TV/categories/", "http://" + ip + "/TV/types/", "http://" + ip + "/TV/tags/");
     }
 
     @Override
@@ -105,65 +117,23 @@ public class MainFragment extends BrowseFragment implements DataLoadingInterface
     }
 
 
-    private void loadRows(String choose_type, String choose_tag) {
-        //last_type_choosed = choose_type;
+    private void loadDefaultRows() {
 
         mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
         CardPresenter cardPresenter = new CardPresenter();
-        int i = 0;
 
-        HeaderItem gridHeaderCateg = new HeaderItem(i++, "TYPE");
-        GridItemPresenter mGridPresenterCateg = new GridItemPresenter();
+        HeaderItem gridHeaderCateg = new HeaderItem(0, "TYPE");
+        GridItemPresenter mGridPresenterCateg = new GridItemPresenter(GRID_ITEM_WIDTH, GRID_ITEM_HEIGHT);
         ArrayObjectAdapter gridRowAdapterCateg = new ArrayObjectAdapter(mGridPresenterCateg);
-        for (Type type_stream : loaded_data.keySet())
-            gridRowAdapterCateg.add(type_stream.getName());
+        gridRowAdapterCateg.add("Channels");
+        gridRowAdapterCateg.add("Movies");
+        gridRowAdapterCateg.add("Series");
         mRowsAdapter.add(new ListRow(gridHeaderCateg, gridRowAdapterCateg));
 
-        if (!choose_type.equals("")) {
-            HeaderItem gridHeaderTag = new HeaderItem(i++, "TAG");
-            GridItemPresenter mGridPresenterTag = new GridItemPresenter();
-            ArrayObjectAdapter gridRowAdapterTag = new ArrayObjectAdapter(mGridPresenterTag);
-            for (Type type_stream : loaded_data.keySet())
-                if (type_stream.getName().equals(choose_type))
-                    for (Tag tag : loaded_data.get(type_stream).keySet()) {
-                        if (tag.getType() == type_stream.getId())
-                            gridRowAdapterTag.add(tag.getName());
-                    }
-            mRowsAdapter.add(new ListRow(gridHeaderTag, gridRowAdapterTag));
 
-        }
+        HeaderItem gridHeader = new HeaderItem(1, "PREFERENCES");
 
-
-        for (Type type_stream : loaded_data.keySet())
-            if (choose_type.equals(type_stream.getName())) {
-                last_type_choosed = type_stream;
-                for (Tag tag : loaded_data.get(type_stream).keySet())
-                    if (tag.getName().equals(choose_tag)) {
-                        last_tag_choosed = tag;
-                        System.err.println(tag);
-                        System.err.println(last_tag_choosed);
-                        for (Category category : loaded_data.get(type_stream).get(tag).keySet()) {
-                            ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
-                            int size_stream_category = loaded_data.get(type_stream).get(tag).get(category).size();
-                            boolean max_channel = false;
-                            for (int j = 0; j < NUM_COLS; j++) {
-                                //listRowAdapter.add(list.get(j % 5));
-                                if (j >= size_stream_category) {
-                                    max_channel = true;
-                                    break;
-                                }
-                                listRowAdapter.add(loaded_data.get(type_stream).get(tag).get(category).get(j));
-                            }
-                            listRowAdapter.add("More");
-                            HeaderItem header = new HeaderItem(i++, category.getName());
-                            mRowsAdapter.add(new ListRow(header, listRowAdapter));
-                        }
-                    }
-            }
-
-        HeaderItem gridHeader = new HeaderItem(i++, "PREFERENCES");
-
-        GridItemPresenter mGridPresenter = new GridItemPresenter();
+        GridItemPresenter mGridPresenter = new GridItemPresenter(GRID_ITEM_WIDTH, GRID_ITEM_HEIGHT);
         ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(mGridPresenter);
         gridRowAdapter.add(getResources().getString(R.string.grid_view));
         gridRowAdapter.add(getString(R.string.error_fragment));
@@ -172,6 +142,22 @@ public class MainFragment extends BrowseFragment implements DataLoadingInterface
 
         setAdapter(mRowsAdapter);
 
+        setupEventListeners();
+    }
+
+    private void loadRowFromWeb(HashMap<HeaderInfo, ArrayObjectAdapter> data) {
+        mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
+        //int i = 0;
+
+
+        for (HeaderInfo head_info : data.keySet()) {
+            HeaderItem head_label = new HeaderItem(head_info.getId(), head_info.getName());
+            mRowsAdapter.add(new ListRow(head_label, data.get(head_info)));
+        }
+
+        setAdapter(mRowsAdapter);
+
+        setupEventListeners();
     }
 
     private void prepareBackgroundManager() {
@@ -246,7 +232,8 @@ public class MainFragment extends BrowseFragment implements DataLoadingInterface
                 Stream movie = (Stream) item;
                 Log.d(TAG, "Item: " + item.toString());
                 Intent intent = new Intent(getActivity(), DetailsActivity.class);
-                intent.putExtra(DetailsActivity.MOVIE, movie);
+                intent.putExtra(DetailsActivity.STREAM, movie);
+                intent.putExtra(DetailsActivity.key_url,"series/seasons/?serie="+row.getHeaderItem().getId());
 
                 Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
                         getActivity(),
@@ -265,27 +252,43 @@ public class MainFragment extends BrowseFragment implements DataLoadingInterface
                         }
                         break;
                     case "TYPE":
-                        loadRows(((String) item), "");
-                        setTitle(((String) item).toUpperCase());
-                        setupEventListeners();
-                        break;
+                        switch (((String) item)) {
+                            case "Movies":
+                                Intent intent2 = new Intent(getActivity(), MainActivity.class);
+                                intent2.putExtra(MainActivity.key_extra_header_url, "movies/categories/");
+                                intent2.putExtra(MainActivity.key_extra_data_url, "movies/?category=");
+                                intent2.putExtra(MainActivity.key_extra_title, "Movies");
+                                startActivity(intent2);
+                                break;
+                            case "Channels":
+                                Intent intent_chan = new Intent(getActivity(), GridActivity.class);
+                                intent_chan.putExtra(GridActivity.keyTitle, "Tags");
+                                intent_chan.putExtra(GridActivity.keyUrl, "channels/tags/");
+                                startActivity(intent_chan);
+                                break;
+                            case "Series":
+                                Intent intent_ser = new Intent(getActivity(), MainActivity.class);
+                                intent_ser.putExtra(MainActivity.key_extra_header_url, "series/categories/");
+                                intent_ser.putExtra(MainActivity.key_extra_data_url, "series/?category=");
+                                intent_ser.putExtra(MainActivity.key_extra_title, "Series");
+                                startActivity(intent_ser);
+                                break;
+                        }
 
-                    case "TAG":
-                        loadRows(last_type_choosed.getName(), ((String) item));
-                        setTitle(last_type_choosed.getName().toUpperCase() + " (" + ((String) item).toUpperCase() + ")");
-                        setupEventListeners();
+                        //setupEventListeners();
                         break;
-
 
                     default:
-                        Intent intent = new Intent(getActivity(), CategoryActivity.class);
-                        intent.putExtra(CategoryActivity.keyType, last_type_choosed.getName());
-                        intent.putExtra(CategoryActivity.keyTag, last_tag_choosed.getName());
-                        intent.putExtra(CategoryActivity.keyCateg, row.getHeaderItem().getName());
 
-                        startActivity(intent);
-                        //loadRows(last_type_choosed);
-                        //setupEventListeners();
+                        Intent intent_chan = new Intent(getActivity(), GridActivity.class);
+                        intent_chan.putExtra(GridActivity.keyTitle, row.getHeaderItem().getName());
+                        if (getTitle().equals("Movies"))
+                            intent_chan.putExtra(GridActivity.keyUrl, "movies/?category=" + row.getHeaderItem().getId());
+                        else if (getTitle().equals("Series"))
+                            intent_chan.putExtra(GridActivity.keyUrl, "series/?categ®ory=" + row.getHeaderItem().getId());
+                        else
+                            intent_chan.putExtra(GridActivity.keyUrl, "channels/?category=" + row.getHeaderItem().getId());
+                        startActivity(intent_chan);
 
 
                 }
@@ -293,15 +296,24 @@ public class MainFragment extends BrowseFragment implements DataLoadingInterface
         }
     }
 
-    //TODO : changed with the API
+
     private final class ItemViewSelectedListener implements OnItemViewSelectedListener {
         @Override
         public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
                                    RowPresenter.ViewHolder rowViewHolder, Row row) {
-            if (item instanceof Movie) {
-                mBackgroundURI = ((Movie) item).getBackgroundImageURI();
-                startBackgroundTimer();
-            }
+            /*if (item instanceof Stream) {
+                try {
+                    Stream stream = ((Stream) item);
+                    if (stream.getImage_url() != null) {
+                        mBackgroundURI = new URI(stream.getImage_url());
+                        startBackgroundTimer();
+
+                    }
+                }catch (java.net.URISyntaxException e){
+                    e.printStackTrace();
+                }
+
+            }*/
 
         }
     }
@@ -322,44 +334,31 @@ public class MainFragment extends BrowseFragment implements DataLoadingInterface
         }
     }
 
-    private class GridItemPresenter extends Presenter {
+
+    private final class Data_receiver implements DataLoadingInterface {
         @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent) {
-            TextView view = new TextView(parent.getContext());
-            view.setLayoutParams(new ViewGroup.LayoutParams(GRID_ITEM_WIDTH, GRID_ITEM_HEIGHT));
-            view.setFocusable(true);
-            view.setFocusableInTouchMode(true);
-            view.setBackgroundColor(getResources().getColor(R.color.default_background));
-            view.setTextColor(Color.WHITE);
-            view.setGravity(Gravity.CENTER);
-            return new ViewHolder(view);
+        public void received_datas(HashMap<HeaderInfo, ArrayObjectAdapter> data) {
+            getFragmentManager().beginTransaction().remove(spinnerFragment).commit();
+
+            loadRowFromWeb(data);
+            setupEventListeners();
+        }
+
+
+        @Override
+        public void request_data() {
+            spinnerFragment = new SpinnerFragment();
+            getFragmentManager().beginTransaction().add(R.id.main_browse_fragment, spinnerFragment).commit();
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder viewHolder, Object item) {
-            ((TextView) viewHolder.view).setText((String) item);
+        public void on_error() {
+            getActivity().finish();
+            //error_occured = true;
+            Intent intent = new Intent(getActivity(), BrowseErrorActivity.class);
+            startActivity(intent);
+
         }
-
-        @Override
-        public void onUnbindViewHolder(ViewHolder viewHolder) {
-        }
     }
 
-
-    @Override
-    public void received_datas(HashMap<Type, HashMap<Tag, HashMap<Category, List<Stream>>>> data) {
-        getFragmentManager().beginTransaction().remove(spinnerFragment).commit();
-        loaded_data = new HashMap<Type, HashMap<Tag, HashMap<Category, List<Stream>>>>(data);
-
-        loadRows("", "");
-
-        setupEventListeners();
-    }
-
-
-    @Override
-    public void request_data() {
-        spinnerFragment = new SpinnerFragment();
-        getFragmentManager().beginTransaction().add(R.id.main_browse_fragment, spinnerFragment).commit();
-    }
 }

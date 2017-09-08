@@ -9,7 +9,7 @@ import java.io.Serializable;
  * Created by msrouji on 04/09/2017.
  */
 
-public class Type implements Serializable {
+public class Type implements Serializable, NameInfo {
     private String name;
     private long id;
 
@@ -27,6 +27,7 @@ public class Type implements Serializable {
         this.name = name;
     }
 
+    @Override
     public String getName() {
         return name;
     }
@@ -41,5 +42,14 @@ public class Type implements Serializable {
                 "name='" + name + '\'' +
                 ", id=" + id +
                 '}';
+    }
+
+    public void buildFromJson(JSONObject object) {
+        try {
+            name = object.getString("name");
+            id = object.getInt("id");
+        }catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }
