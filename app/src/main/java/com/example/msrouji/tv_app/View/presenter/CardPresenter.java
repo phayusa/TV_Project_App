@@ -14,8 +14,6 @@
 
 package com.example.msrouji.tv_app.View.presenter;
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v17.leanback.widget.BaseCardView;
 import android.support.v17.leanback.widget.ImageCardView;
@@ -28,11 +26,6 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.example.msrouji.tv_app.Model.Stream;
 import com.example.msrouji.tv_app.R;
-import com.example.msrouji.tv_app.Utils;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
-
-import java.net.URI;
 
 /*
  * A CardPresenter is used to generate Views and bind Objects to them on demand.
@@ -83,7 +76,6 @@ public class CardPresenter extends Presenter {
         ImageCardView cardView = (ImageCardView) viewHolder.view;
 
         if (item instanceof String) {
-            Log.d(TAG, "onBindViewHolder String");
             cardView.setTitleText(((String) item));
             cardView.setContentText("");
             cardView.setMainImageDimensions(CARD_WIDTH_NO_IMG, CARD_HEIGHT);
@@ -92,7 +84,6 @@ public class CardPresenter extends Presenter {
         } else {
             Stream stream = ((Stream) item);
 
-            Log.d(TAG, "onBindViewHolder Stream");
             cardView.setTitleText(stream.getName());
             //cardView.setContentText(stream.getSummary());
             cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
@@ -100,9 +91,7 @@ public class CardPresenter extends Presenter {
 
 
             if (stream.getImage_url() != null) {
-                cardView.setTitleText(stream.getName());
-                cardView.setContentText(stream.getSummary());
-                cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
+                cardView.setContentText(stream.getSub_info());
 
                 Glide.with(viewHolder.view.getContext())
                         .load(stream.getImage_url())

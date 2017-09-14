@@ -18,6 +18,7 @@ public class Stream implements Serializable, NameInfo {
     private String url;
     private String image_url=null;
     private String summary;
+    private String sub_info;
 
     public Stream(){}
 
@@ -29,7 +30,10 @@ public class Stream implements Serializable, NameInfo {
     public Stream(JSONObject receiveObj, boolean image){
         try {
             id = receiveObj.getLong("id");
-            name = receiveObj.getString("name");
+            if (receiveObj.has("name"))
+                name = receiveObj.getString("name");
+            else
+                name = "Episode "+receiveObj.getInt("number");
             if (receiveObj.has("url"))
                 url = receiveObj.getString("url").replace(" ","");
 
@@ -38,6 +42,9 @@ public class Stream implements Serializable, NameInfo {
 
             if (receiveObj.has("summary"))
                 summary = receiveObj.getString("summary");
+
+            if (receiveObj.has("seasons"))
+                sub_info = receiveObj.getInt("seasons")+" seasons";
 
         }catch (JSONException e) {
             e.printStackTrace();
@@ -55,6 +62,8 @@ public class Stream implements Serializable, NameInfo {
     }
 
     public String getUrl() {
+        if (url == null)
+            return null;
         if (!url.startsWith("http"))
             return url.substring(1);
         return url;
@@ -72,6 +81,14 @@ public class Stream implements Serializable, NameInfo {
 
     public String getSummary() {
         return summary;
+    }
+
+    public String getSub_info() {
+        return sub_info;
+    }
+
+    public long getId() {
+        return id;
     }
 
     @Override

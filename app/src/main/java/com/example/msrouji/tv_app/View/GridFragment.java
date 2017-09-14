@@ -19,6 +19,7 @@ import com.example.msrouji.tv_app.Model.HeaderInfo;
 import com.example.msrouji.tv_app.Model.Stream;
 import com.example.msrouji.tv_app.R;
 import com.example.msrouji.tv_app.View.presenter.CardPresenter;
+import com.example.msrouji.tv_app.View.presenter.GridItemPresenter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,9 +46,17 @@ public class GridFragment extends android.support.v17.leanback.app.VerticalGridF
         gridPresenter.setNumberOfColumns(NUM_COLUMNS);
         setGridPresenter(gridPresenter);
 
-        //new GridFactory(new Data_listener(), new GridItemPresenter(400,400)).execute("http://10.53.8.144:8000/TV/channels/tags/");
-        //new GridFactory(new Data_listener(), new GridItemPresenter(400,400)).execute("http://10.53.8.144:8000/TV/"+ ((GridActivity) getActivity()).getUrl_data());
-        new GridFactory(new Data_listener(), new CardPresenter()).execute("http://10.53.8.144:8000/TV/"+ ((GridActivity) getActivity()).getUrl_data(),"");
+        GridActivity activity = ((GridActivity) getActivity());
+
+        if (activity.is_stream_view())
+            if (activity.isHas_image())
+                new GridFactory(new Data_listener(), new CardPresenter()).execute(getString(R.string.ip) + "TV/" + activity.getUrl_data(), "");
+            else
+                new GridFactory(new Data_listener(), new GridItemPresenter(400, 400)).execute(getString(R.string.ip) + "TV/" + activity.getUrl_data(), "");
+        else if (((GridActivity) getActivity()).getExtra_label() != null)
+            new GridFactory(new Data_listener(), new GridItemPresenter(400, 400), activity.getExtra_label()).execute(getString(R.string.ip) + "TV/" + activity.getUrl_data());
+        else
+            new GridFactory(new Data_listener(), new GridItemPresenter(400, 400)).execute(getString(R.string.ip) + "TV/" + activity.getUrl_data());
 
 
         //String ip = "10.53.8.123:8000";
@@ -56,17 +65,6 @@ public class GridFragment extends android.support.v17.leanback.app.VerticalGridF
 
     }
 
-
-   /* private void setupFragment() {
-
-        mAdapter = new ArrayObjectAdapter(new CardPresenter());
-
-
-        for (Stream item : streams) {
-            mAdapter.add(item);
-        }
-        setAdapter(mAdapter);
-    }*/
 
     private class Data_listener implements DataLoadingInterface {
         @Override
@@ -114,15 +112,27 @@ public class GridFragment extends android.support.v17.leanback.app.VerticalGridF
         @Override
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
                                   RowPresenter.ViewHolder rowViewHolder, Row row) {
-            if (item instanceof HeaderInfo){
+            if (item instanceof HeaderInfo) {
                 HeaderInfo header = ((HeaderInfo) item);
                 Intent intent = new Intent(getActivity(), MainActivity.class);
                 intent.putExtra(MainActivity.key_extra_title, header.getName());
-                intent.putExtra(MainActivity.key_extra_header_url, "channels/categories/?tag="+ header.getId());
+                intent.putExtra(MainActivity.key_extra_header_url, "channels/categories/?tag=" + header.getId());
                 intent.putExtra(MainActivity.key_extra_data_url, "channels/?category=");
                 intent.putExtra(MainActivity.key_extra_columns, 5);
 
                 getActivity().startActivity(intent);
+            }else{
+                Stream movie = ((Stream) item);
+                if(movie.getUrl().endsWith(".avi")) {
+                    Intent intent = new Intent(getActivity(), VideoAviAct.class);
+                    intent.putExtra(VideoAviAct.key_url, movie.getUrl());
+                    getActivity().startActivity(intent);
+                }else{
+                    Intent intent = new Intent(getActivity(), VideoActivity.class);
+                    intent.putExtra(DetailsActivity.STREAM, movie);
+                    getActivity().startActivity(intent);
+                }
+                System.err.println(item);
             }
         }
 

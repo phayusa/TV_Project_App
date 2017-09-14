@@ -51,15 +51,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 /*
- * LeanbackDetailsFragment extends DetailsFragment, a Wrapper fragment for leanback details screens.
+ * LeanbackDetailsFragment extends VideoDetailFragment, a Wrapper fragment for leanback details screens.
  * It shows a detailed view of video and its meta plus related videos.
  */
-public class VideoDetailsFragment extends DetailsFragment {
-    private static final String TAG = "VideoDetailsFragment";
+public class VideoDetailFragment extends android.support.v17.leanback.app.DetailsFragment {
+    private static final String TAG = "VideoDetailFragment";
 
     private static final int ACTION_WATCH_TRAILER = 1;
-    private static final int ACTION_RENT = 2;
-    private static final int ACTION_BUY = 3;
 
     private static final int DETAIL_THUMB_WIDTH = 274;
     private static final int DETAIL_THUMB_HEIGHT = 400;
@@ -77,7 +75,7 @@ public class VideoDetailsFragment extends DetailsFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        //Log.d(TAG, "onCreate DetailsFragment");
+        //Log.d(TAG, "onCreate VideoDetailFragment");
         super.onCreate(savedInstanceState);
 
         prepareBackgroundManager();
@@ -85,25 +83,17 @@ public class VideoDetailsFragment extends DetailsFragment {
         mSelectedStream = (Stream) getActivity().getIntent()
                 .getSerializableExtra(DetailsActivity.STREAM);
         if (mSelectedStream != null) {
-            new GridFactory(new DataListener(), new GridItemPresenter(400,400)).execute("http://10.53.8.144:8000/TV/"+ ((DetailsActivity) getActivity()).getUrl_data());
+            new GridFactory(new DataListener(), new GridItemPresenter(200,100), "Season").execute(getString(R.string.ip)+"TV/"+ ((DetailsActivity) getActivity()).getUrl_data());
 
             setupAdapter();
             setupDetailsOverviewRowPresenter();
 
-            // TODO : change to call API
-            //setupMovieListRow();
-            //setupMovieListRowPresenter();
-            //updateBackground(mSelectedStream.getBackgroundImageUrl());
+            //updateBackground(mSelectedStream.getImage_url());
             setOnItemViewClickedListener(new ItemViewClickedListener());
         } else {
             Intent intent = new Intent(getActivity(), MainActivity.class);
             startActivity(intent);
         }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
     }
 
     private void prepareBackgroundManager() {
@@ -134,10 +124,10 @@ public class VideoDetailsFragment extends DetailsFragment {
         setAdapter(mAdapter);
     }
 
-    private void setupDetailsOverviewRow() {
+    private void setupDetailsOverviewRow(ArrayObjectAdapter list_seasons) {
         //Log.d(TAG, "doInBackground: " + mSelectedStream.toString());
         final DetailsOverviewRow row = new DetailsOverviewRow(mSelectedStream);
-        row.setImageDrawable(getResources().getDrawable(R.drawable.default_background));
+        row.setImageDrawable(getActivity().getDrawable(R.drawable.default_background));
 
 
         int width = Utils.convertDpToPixel(getActivity()
@@ -159,11 +149,16 @@ public class VideoDetailsFragment extends DetailsFragment {
                     }
                 });
 
-        row.addAction(new Action(ACTION_WATCH_TRAILER, getResources().getString(
-                R.string.Start), getResources().getString(R.string.watch_trailer_2)));
+        int size_data = list_seasons.size();
+        System.err.println(size_data);
+        for (int nth_data = 0; nth_data < size_data; nth_data++) {
+            HeaderInfo info = ((HeaderInfo) list_seasons.get(nth_data));
+            row.addAction(new Action (info.getId(), info.getName()));
+        }
+        //row.setActionsAdapter(list_seasons);
+        //row.setActionsAdapter(list_seasons);
 
         mAdapter.add(row);
-        //mAdapter.add(data_received);
     }
 
 
@@ -178,18 +173,23 @@ public class VideoDetailsFragment extends DetailsFragment {
         detailsPresenter.setSharedElementEnterTransition(getActivity(),
                 DetailsActivity.SHARED_ELEMENT_NAME);
 
-        /*detailsPresenter.setOnActionClickedListener(new OnActionClickedListener() {
+
+        detailsPresenter.setOnActionClickedListener(new OnActionClickedListener() {
             @Override
             public void onActionClicked(Action action) {
-                if (action.getId() == ACTION_WATCH_TRAILER) {
-                    Intent intent = new Intent(getActivity(), PlaybackOverlayActivity.class);
-                    intent.putExtra(DetailsActivity.STREAM, (Serializable) mSelectedStream);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(getActivity(), action.toString(), Toast.LENGTH_SHORT).show();
-                }
+
+                Intent intent = new Intent(getActivity(), GridActivity.class);
+                intent.putExtra(GridActivity.keyUrl, "series/episodes/?season="+action.getId());
+                intent.putExtra(GridActivity.keyType, true);
+                intent.putExtra(GridActivity.keyImage, false);
+                intent.putExtra(GridActivity.keyTitle, action.getLabel1());
+                intent.putExtra(GridActivity.keyLabel,"Episode");
+
+
+                //intent.putExtra(DetailsActivity.STREAM, (Serializable) mSelectedStream);
+                startActivity(intent);
             }
-        });*/
+        });
         mPresenterSelector.addClassPresenter(DetailsOverviewRow.class, detailsPresenter);
     }
 
@@ -222,7 +222,8 @@ public class VideoDetailsFragment extends DetailsFragment {
         public void received_datas(HashMap<HeaderInfo, ArrayObjectAdapter> data) {
 
             //setAdapter(data.get(null));
-            setupDetailsOverviewRow();
+
+            setupDetailsOverviewRow(data.get(null));
 
             System.err.println(((HeaderInfo) ((ArrayObjectAdapter) data.get(null)).get(0)).getName());
         }

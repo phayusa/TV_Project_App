@@ -11,46 +11,35 @@ import com.example.msrouji.tv_app.Model.Type;
 import com.example.msrouji.tv_app.R;
 
 public class GridActivity extends Activity {
-    private String category;
-    private String type;
-    private String tag;
     private String title_view;
     private String url_data;
+    private boolean is_stream_view;
+    private boolean has_image;
+    private String extra_label;
 
-    public final static String keyCateg = "category_choose";
-    public final static String keyType = "type_choose";
-    public final static String keyTag = "tag_choose";
     public final static String keyTitle = "title_choose";
     public final static String keyUrl = "utld kl, d,s";
+    public final static String keyType = "tyê jsisj ";
+    public final static String keyLabel = "dspsdopdkdksopskopk";
+    public final static String keyImage = "ssospsp, osps,opp";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        if (intent.hasExtra(keyCateg)) {
-            category = intent.getStringExtra(keyCateg);
-            type = intent.getStringExtra(keyType);
-            tag = intent.getStringExtra(keyTag);
-        }
         title_view = intent.getStringExtra(keyTitle);
         url_data = intent.getStringExtra(keyUrl);
+        is_stream_view = intent.getBooleanExtra(keyType, false);
+        if (intent.hasExtra(keyLabel))
+            extra_label = intent.getStringExtra(keyLabel);
+        if (intent.hasExtra(keyImage))
+            has_image = intent.getBooleanExtra(keyImage, false);
 
         setContentView(R.layout.activity_category);
 
     }
 
-    public String getCategory() {
-        return category;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getTag() {
-        return tag;
-    }
 
     public String getTitle_view() {
         return title_view;
@@ -58,5 +47,17 @@ public class GridActivity extends Activity {
 
     public String getUrl_data() {
         return url_data;
+    }
+
+    public boolean is_stream_view() {
+        return is_stream_view;
+    }
+
+    public String getExtra_label() {
+        return extra_label;
+    }
+
+    public boolean isHas_image() {
+        return has_image;
     }
 }

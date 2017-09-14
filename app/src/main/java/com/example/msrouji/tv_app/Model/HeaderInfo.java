@@ -10,19 +10,29 @@ import org.json.JSONObject;
 public class HeaderInfo implements NameInfo {
     private String name;
     private long id;
+    private String extra_label;
 
     public HeaderInfo(String name, long id) {
         this.name = name;
         this.id = id;
     }
 
-    public HeaderInfo(JSONObject object) {
+    public HeaderInfo(JSONObject object, String extra_label) {
         try {
             id = object.getLong("id");
             if (object.has("number"))
-                name = "Season "+ object.getString("number");
+                name = extra_label + " " + object.getString("number");
             else
                 name = object.getString("name");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public HeaderInfo(JSONObject object) {
+        try {
+            id = object.getLong("id");
+            name = object.getString("name");
         } catch (JSONException e) {
             e.printStackTrace();
         }

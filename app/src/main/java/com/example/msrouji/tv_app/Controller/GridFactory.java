@@ -28,11 +28,17 @@ import java.util.List;
 public class GridFactory extends AsyncTask<String, Void, Void> {
     private ArrayObjectAdapter list_objects;
     private DataLoadingInterface data_loader;
+    private String extra_label;
 
 
     public GridFactory(DataLoadingInterface data_loader, Presenter object_presenter) {
         this.data_loader = data_loader;
         list_objects = new ArrayObjectAdapter(object_presenter);
+    }
+
+    public GridFactory(DataLoadingInterface data_loader, Presenter object_presenter, String extra_label) {
+        this(data_loader,object_presenter);
+        this.extra_label = extra_label;
     }
 
     private JSONArray requestData(String adress) {
@@ -72,7 +78,7 @@ public class GridFactory extends AsyncTask<String, Void, Void> {
                 if (params.length == 2)
                     list_objects.add(new Stream(tags.getJSONObject(nth_tag)));
                 else
-                    list_objects.add(new HeaderInfo(tags.getJSONObject(nth_tag)));
+                    list_objects.add(new HeaderInfo(tags.getJSONObject(nth_tag), extra_label));
             }
 
 

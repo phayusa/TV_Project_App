@@ -95,10 +95,10 @@ public class MainFragment extends BrowseFragment {
                 setTitle(activity.getTitle_view());
                 if (activity.getTitle_view().equals("Series"))
                     new MainFactory(new Data_receiver(), new CardPresenter(), activity.getNb_columns())
-                            .execute("http://10.53.8.144:8000/", activity.getHeader_url(), activity.getData_url());
+                            .execute(getString(R.string.ip), activity.getHeader_url(), activity.getData_url());
                 else
                     new MainFactory(new Data_receiver(), new GridItemPresenter(300, 300), activity.getNb_columns())
-                            .execute("http://10.53.8.144:8000/", activity.getHeader_url(), activity.getData_url());
+                            .execute(getString(R.string.ip), activity.getHeader_url(), activity.getData_url());
             }
         }
 
@@ -231,15 +231,23 @@ public class MainFragment extends BrowseFragment {
             if (item instanceof Stream) {
                 Stream movie = (Stream) item;
                 Log.d(TAG, "Item: " + item.toString());
-                Intent intent = new Intent(getActivity(), DetailsActivity.class);
-                intent.putExtra(DetailsActivity.STREAM, movie);
-                intent.putExtra(DetailsActivity.key_url,"series/seasons/?serie="+row.getHeaderItem().getId());
 
-                Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                        getActivity(),
-                        ((ImageCardView) itemViewHolder.view).getMainImageView(),
-                        DetailsActivity.SHARED_ELEMENT_NAME).toBundle();
-                getActivity().startActivity(intent, bundle);
+                if (movie.getUrl() == null) {
+                    Intent intent = new Intent(getActivity(), DetailsActivity.class);
+                    intent.putExtra(DetailsActivity.STREAM, movie);
+                    intent.putExtra(DetailsActivity.key_url, "series/seasons/?serie=" + movie.getId());
+
+                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            getActivity(),
+                            ((ImageCardView) itemViewHolder.view).getMainImageView(),
+                            DetailsActivity.SHARED_ELEMENT_NAME).toBundle();
+                    getActivity().startActivity(intent, bundle);
+                } else {
+                    Intent intent = new Intent(getActivity(), VideoActivity.class);
+                    intent.putExtra(DetailsActivity.STREAM, movie);
+                    getActivity().startActivity(intent);
+                    //Toast.makeText(getActivity().getApplicationContext(), ((Stream) item).getUrl(), Toast.LENGTH_LONG);
+                }
             } else if (item instanceof String) {
                 switch (row.getHeaderItem().getName()) {
                     case "PREFERENCES":
@@ -271,6 +279,7 @@ public class MainFragment extends BrowseFragment {
                                 intent_ser.putExtra(MainActivity.key_extra_header_url, "series/categories/");
                                 intent_ser.putExtra(MainActivity.key_extra_data_url, "series/?category=");
                                 intent_ser.putExtra(MainActivity.key_extra_title, "Series");
+                                intent_ser.putExtra(MainActivity.key_extra_label, "Season");
                                 startActivity(intent_ser);
                                 break;
                         }
@@ -282,12 +291,20 @@ public class MainFragment extends BrowseFragment {
 
                         Intent intent_chan = new Intent(getActivity(), GridActivity.class);
                         intent_chan.putExtra(GridActivity.keyTitle, row.getHeaderItem().getName());
-                        if (getTitle().equals("Movies"))
+                        if (getTitle().equals("Movies")) {
                             intent_chan.putExtra(GridActivity.keyUrl, "movies/?category=" + row.getHeaderItem().getId());
-                        else if (getTitle().equals("Series"))
-                            intent_chan.putExtra(GridActivity.keyUrl, "series/?categ®ory=" + row.getHeaderItem().getId());
-                        else
+                            intent_chan.putExtra(GridActivity.keyType, true);
+                            intent_chan.putExtra(GridActivity.keyImage, false);
+                            //intent_chan.putExtra(GridActivity.keyType, true);
+                        } else if (getTitle().equals("Series")) {
+                            intent_chan.putExtra(GridActivity.keyUrl, "series/?category=" + row.getHeaderItem().getId());
+                            intent_chan.putExtra(GridActivity.keyType, true);
+                            intent_chan.putExtra(GridActivity.keyImage, true);
+                        } else {
                             intent_chan.putExtra(GridActivity.keyUrl, "channels/?category=" + row.getHeaderItem().getId());
+                            intent_chan.putExtra(GridActivity.keyType, true);
+                            intent_chan.putExtra(GridActivity.keyImage, false);
+                        }
                         startActivity(intent_chan);
 
 

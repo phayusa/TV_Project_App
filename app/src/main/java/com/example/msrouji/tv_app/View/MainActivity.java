@@ -31,11 +31,13 @@ public class MainActivity extends Activity {
     public final static String key_extra_data_url = "djkdsnjsd,nlsd,lq,klq";
     public final static String key_extra_title = "sjsi,qd,spi,sozo";
     public final static String key_extra_columns = "sjsi,qd,s columns";
+    public final static String key_extra_label = "sdipdspkdsoskop";
 
     private String header_url;
     private String data_url;
     private String title_view;
     private int nb_columns;
+    private String extra_label;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,9 @@ public class MainActivity extends Activity {
 
             if (old_intent.hasExtra(key_extra_title))
                 title_view = old_intent.getStringExtra(key_extra_title);
+
+            if (old_intent.hasExtra(key_extra_label))
+                extra_label = old_intent.getStringExtra(key_extra_label);
 
             nb_columns = old_intent.getIntExtra(key_extra_columns, 5);
         }
@@ -71,5 +76,9 @@ public class MainActivity extends Activity {
 
     public int getNb_columns() {
         return nb_columns;
+    }
+
+    public String getExtra_label() {
+        return extra_label;
     }
 }
