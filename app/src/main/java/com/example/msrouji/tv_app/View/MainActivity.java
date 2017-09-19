@@ -16,14 +16,23 @@ package com.example.msrouji.tv_app.View;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v17.leanback.widget.ArrayObjectAdapter;
 
+import com.example.msrouji.tv_app.Controller.DataLoadingInterface;
+import com.example.msrouji.tv_app.Controller.LoginRequest;
+import com.example.msrouji.tv_app.Controller.RegisterDevice;
+import com.example.msrouji.tv_app.Model.HeaderInfo;
 import com.example.msrouji.tv_app.R;
+
+import java.util.HashMap;
+import java.util.UUID;
 
 /*
  * MainActivity class that loads MainFragment
  */
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements DataLoadingInterface{
     /**
      * Called when the activity is first created.
      */
@@ -38,6 +47,9 @@ public class MainActivity extends Activity {
     private String title_view;
     private int nb_columns;
     private String extra_label;
+
+    private static String id_device;
+    private static String token;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,9 +68,32 @@ public class MainActivity extends Activity {
                 extra_label = old_intent.getStringExtra(key_extra_label);
 
             nb_columns = old_intent.getIntExtra(key_extra_columns, 5);
+
+            setContentView(R.layout.activity_main);
+
+        }else {
+
+            SharedPreferences preferences = getSharedPreferences(getString(R.string.pref_name), MODE_PRIVATE);
+            // First time launch application
+            if (preferences.getString(getString(R.string.pref_name_id), null) == null) {
+                String id = UUID.randomUUID().toString();
+
+                preferences.edit().putString(getString(R.string.pref_name_id), id).apply();
+                id_device = id;
+
+                new RegisterDevice(this).execute(getString(R.string.ip), id_device);
+
+            } else {
+                id_device = preferences.getString(getString(R.string.pref_name_id), null);
+                //startActivity(new Intent(this, MainActivity.class));
+                new LoginRequest(new LoginSend(this)).execute(getString(R.string.ip), id_device);
+
+                //setContentView(R.layout.activity_main);
+
+            }
+            System.err.println(id_device);
         }
 
-        setContentView(R.layout.activity_main);
     }
 
     public String getHeader_url() {
@@ -80,5 +115,56 @@ public class MainActivity extends Activity {
 
     public String getExtra_label() {
         return extra_label;
+    }
+
+    public static String getId_device() {
+        return id_device;
+    }
+
+    public static String getToken() {
+        return token;
+    }
+
+    private class LoginSend implements DataLoadingInterface{
+        private Activity instance;
+
+        public LoginSend(Activity instance) {
+            this.instance = instance;
+        }
+
+        @Override
+        public void received_datas(HashMap<HeaderInfo, ArrayObjectAdapter> data) {
+            System.err.println(token);
+            token = ((HeaderInfo) data.keySet().toArray()[0]).getName();
+            instance.setContentView(R.layout.activity_main);
+        }
+
+        @Override
+        public void request_data() {
+
+        }
+
+        @Override
+        public void on_error() {
+
+        }
+    }
+
+    @Override
+    public void received_datas(HashMap<HeaderInfo, ArrayObjectAdapter> data) {
+        //setContentView(R.layout.activity_main);
+        System.err.println(" Je passe a ");
+        new LoginRequest(new LoginSend(this)).execute(getString(R.string.ip), id_device);
+
+    }
+
+    @Override
+    public void request_data() {
+
+    }
+
+    @Override
+    public void on_error() {
+        getSharedPreferences(getString(R.string.pref_name), MODE_PRIVATE).edit().putString(getString(R.string.pref_name_id), null).apply();
     }
 }

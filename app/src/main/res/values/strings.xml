@@ -29,7 +29,9 @@
     <string name="should_start">shouldStart</string>
     <string name="start_position">startPosition</string>
     <string name="search_results">Search Results</string>
-    <string name="ip">http://176.31.99.139:8000/</string>
+    <string name="ip">http://192.168.0.100:8000/</string>
+    <string name="pref_name">Id_deviced_shared</string>
+    <string name="pref_name_id">id_saved</string>
 
     <!-- Error messages -->
     <string name="video_error_media_load_timeout">Media loading timed out</string>
@@ -40,16 +42,4 @@
     <string name="oops">Oops</string>
     <string name="title_activity_login">Sign in</string>
 
-    <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password (optional)</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
 </resources>

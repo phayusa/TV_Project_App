@@ -4,11 +4,9 @@ import android.os.AsyncTask;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.Presenter;
 
-import com.example.msrouji.tv_app.Model.Category;
 import com.example.msrouji.tv_app.Model.HeaderInfo;
 import com.example.msrouji.tv_app.Model.Stream;
-import com.example.msrouji.tv_app.Model.Tag;
-import com.example.msrouji.tv_app.Model.Type;
+import com.example.msrouji.tv_app.View.MainActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,7 +17,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by msrouji on 01/09/2017.
@@ -46,6 +43,8 @@ public class GridFactory extends AsyncTask<String, Void, Void> {
             URL url = new URL(adress);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
+            //conn.setRequestProperty("Authorisation", MainActivity.getId_device());
+            conn.setRequestProperty("Authorization", "JWT " + MainActivity.getToken());
 
             InputStreamReader reader = new InputStreamReader(conn.getInputStream());
             BufferedReader buff = new BufferedReader(reader);

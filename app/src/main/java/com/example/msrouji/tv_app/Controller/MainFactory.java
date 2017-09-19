@@ -6,6 +6,7 @@ import android.support.v17.leanback.widget.Presenter;
 
 import com.example.msrouji.tv_app.Model.HeaderInfo;
 import com.example.msrouji.tv_app.Model.Stream;
+import com.example.msrouji.tv_app.View.MainActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,6 +47,8 @@ public class MainFactory extends AsyncTask<String, Void, Void> {
         try {
             URL url = new URL(adress);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            //conn.setRequestProperty("Authorisation", MainActivity.getId_device());
+            conn.setRequestProperty("Authorization", "JWT " + MainActivity.getToken());
             conn.setRequestMethod("GET");
 
             InputStreamReader reader = new InputStreamReader(conn.getInputStream());
