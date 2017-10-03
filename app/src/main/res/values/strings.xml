@@ -1,8 +1,6 @@
 <resources>
     <string name="app_name">TV_App</string>
     <string name="browse_title"><![CDATA[Videos by Your Company]]></string>
-    <string name="related_movies">Related Videos</string>
-    <string name="vertical_grid_title"><![CDATA[Vertical Video Grid]]></string>
     <string name="error">Error</string>
     <string name="ok">OK</string>
     <string name="pause">Pause</string>
@@ -20,18 +18,26 @@
     <string name="error_fragment">Error Fragment</string>
     <string name="personal_settings">Personal Settings</string>
     <string name="Start">Read</string>
-    <string name="watch_trailer_2">FREE</string>
-    <string name="rent_1">Rent By Day</string>
-    <string name="rent_2">From $1.99</string>
-    <string name="buy_1">Buy and Own</string>
-    <string name="buy_2">AT $9.99</string>
     <string name="movie">Movie</string>
     <string name="should_start">shouldStart</string>
     <string name="start_position">startPosition</string>
     <string name="search_results">Search Results</string>
+
+    <!-- Ip setting -->
     <string name="ip">http://192.168.0.100:8000/</string>
+
+    <!-- Pref Name -->
     <string name="pref_name">Id_deviced_shared</string>
     <string name="pref_name_id">id_saved</string>
+    <string name="pay_button_name">Pay</string>
+
+    <!-- Subscription values -->
+    <string name="subscription_consult">Information</string>
+    <string name="subscription_reabo">Subscribe</string>
+    <string name="subscription_time">Subscribe 1 year</string>
+
+    <!-- Application version-->
+    <string name="app_version">1.0</string>
 
     <!-- Error messages -->
     <string name="video_error_media_load_timeout">Media loading timed out</string>

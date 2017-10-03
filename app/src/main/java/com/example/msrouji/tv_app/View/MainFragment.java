@@ -131,7 +131,7 @@ public class MainFragment extends BrowseFragment {
         mRowsAdapter.add(new ListRow(gridHeaderCateg, gridRowAdapterCateg));
 
 
-        HeaderItem gridHeader = new HeaderItem(1, "PREFERENCES");
+        HeaderItem gridHeader = new HeaderItem(1, "Subscription");
 
         GridItemPresenter mGridPresenter = new GridItemPresenter(GRID_ITEM_WIDTH, GRID_ITEM_HEIGHT);
         ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(mGridPresenter);
@@ -250,9 +250,9 @@ public class MainFragment extends BrowseFragment {
                 }
             } else if (item instanceof String) {
                 switch (row.getHeaderItem().getName()) {
-                    case "PREFERENCES":
+                    case "Subscription":
                         if (((String) item).indexOf(getString(R.string.error_fragment)) >= 0) {
-                            Intent intent = new Intent(getActivity(), BrowseErrorActivity.class);
+                            Intent intent = new Intent(getActivity(), Paid_Activity.class);
                             startActivity(intent);
                         } else {
                             Toast.makeText(getActivity(), ((String) item), Toast.LENGTH_SHORT)
