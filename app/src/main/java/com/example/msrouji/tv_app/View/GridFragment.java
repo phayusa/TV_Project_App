@@ -99,7 +99,7 @@ public class GridFragment extends android.support.v17.leanback.app.VerticalGridF
 
             @Override
             public void onClick(View view) {
-                Toast.makeText(getActivity(), "Implement your own in-app search", Toast.LENGTH_LONG)
+                Toast.makeText(getActivity(), getString(R.string.search_teaser), Toast.LENGTH_LONG)
                         .show();
             }
         });

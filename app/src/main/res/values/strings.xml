@@ -37,7 +37,13 @@
     <string name="subscription_time">Subscribe 1 year</string>
 
     <!-- Application version-->
-    <string name="app_version">1.0</string>
+    <string name="app_version">1.2</string>
+
+    <!-- Update messages -->
+    <string name="update_desc"> Download :</string>
+
+    <!-- Teaser messages -->
+    <string name="search_teaser">Implement in the next version</string>
 
     <!-- Error messages -->
     <string name="video_error_media_load_timeout">Media loading timed out</string>

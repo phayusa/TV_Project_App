@@ -153,7 +153,6 @@ public class MainActivity extends Activity implements DataLoadingInterface{
     @Override
     public void received_datas(HashMap<HeaderInfo, ArrayObjectAdapter> data) {
         //setContentView(R.layout.activity_main);
-        System.err.println(" Je passe a ");
         new LoginRequest(new LoginSend(this)).execute(getString(R.string.ip), id_device);
 
     }
