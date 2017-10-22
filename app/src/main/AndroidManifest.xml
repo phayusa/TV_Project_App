@@ -3,8 +3,7 @@
     package="com.example.msrouji.tv_app">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -17,7 +16,6 @@
         android:name="android.software.leanback"
         android:required="true" />
 
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -25,15 +23,18 @@
         android:screenOrientation="landscape"
         android:supportsRtl="true"
         android:theme="@style/Theme.Leanback">
-        <activity android:name=".View.MainActivity" />
-        <activity android:name=".View.DetailsActivity" />
-        <activity android:name=".View.BrowseErrorActivity" />
-        <activity android:name=".View.GridActivity" />
-        <activity android:name=".View.VideoActivity" />
-        <activity android:name=".View.VideoAviAct" />
-        <activity android:name=".View.Paid_Activity" />
+
+        <activity android:name=".view.MainActivity" />
+        <activity android:name=".view.DetailsActivity" />
+        <activity android:name=".view.BrowseErrorActivity" />
+        <activity android:name=".view.GridActivity" />
+        <activity android:name=".view.VideoActivity" />
+        <activity android:name=".view.VideoAviAct" />
+        <activity android:name=".view.Paid_Activity" />
+        <activity android:name=".view.SubscriptionActivity" />
+
         <activity
-            android:name=".View.UpdateActivity"
+            android:name=".view.UpdateActivity"
             android:banner="@drawable/app_icon_your_company"
             android:icon="@drawable/app_icon_your_company"
             android:label="@string/app_name"

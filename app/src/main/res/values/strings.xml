@@ -24,26 +24,38 @@
     <string name="search_results">Search Results</string>
 
     <!-- Ip setting -->
-    <string name="ip">http://192.168.0.100:8000/</string>
+    <string name="ip">http://176.31.99.139:8000/</string>
+
+    <!-- Sub Name -->
+    <string name="subscription_title">Abonnement</string>
+    <string name="subscription_paid">Souscrire 1 an supplémentaire</string>
+    <string name="subscription_time_left">Temps d\'abonnements restants</string>
+    <string name="subscription_new_date">Date après abonnement :</string>
 
     <!-- Pref Name -->
     <string name="pref_name">Id_deviced_shared</string>
     <string name="pref_name_id">id_saved</string>
-    <string name="pay_button_name">Pay</string>
+    <string name="pay_button_name">Souscrire</string>
 
     <!-- Subscription values -->
     <string name="subscription_consult">Information</string>
-    <string name="subscription_reabo">Subscribe</string>
-    <string name="subscription_time">Subscribe 1 year</string>
+    <string name="subscription_reabo">Souscrire</string>
+    <string name="subscription_time">Souscrire 1 an supplémentaire</string>
 
     <!-- Application version-->
-    <string name="app_version">1.2</string>
+    <string name="app_version">0.93</string>
 
     <!-- Update messages -->
-    <string name="update_desc"> Download :</string>
+    <string name="update_desc"> Téléchargement :</string>
 
     <!-- Teaser messages -->
     <string name="search_teaser">Implement in the next version</string>
+
+    <!-- Teaser messages -->
+    <string name="error_reach_server">Problème de connection avec le serveur. L\'application va se fermer</string>
+    <string name="update_available">Une mise à jour de l\'application est disponible. Elle doit être réalisé pour continuer à utiliser l\'appli.</string>
+    <string name="error_download_apk">Erreur rencontré durant le téléchargement de l\'apk. L\'application va se fermer.</string>
+
 
     <!-- Error messages -->
     <string name="video_error_media_load_timeout">Media loading timed out</string>
@@ -53,5 +65,6 @@
     <string name="dismiss_error">Dismiss</string>
     <string name="oops">Oops</string>
     <string name="title_activity_login">Sign in</string>
+    <string name="service_name">TV_App Updater</string>
 
 </resources>
